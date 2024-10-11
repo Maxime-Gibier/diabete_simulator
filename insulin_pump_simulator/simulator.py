@@ -7,11 +7,11 @@ from .pdm import PDM
 from .config import PumpConfig
 
 class Simulator:
-    def __init__(self, patient, pump, cgm, controller, duration):
-        self.patient = patient
-        self.pump = pump
-        self.cgm = cgm
-        self.controller = controller
+    def __init__(self, duration: int):
+        self.patient = Patient()
+        self.pump = InsulinPump()
+        self.cgm = CGM()
+        self.controller = ClosedLoopController(self.pump)
         self.duration = duration
         self.event_log = []
         self.simulation_time = 0
@@ -24,7 +24,7 @@ class Simulator:
         self.event_log.append(f"Bolus alimentaire calculé : {bolus:.1f} U")
         return bolus
 
-    def run(self, duration):
+    def run_simulation(self, duration: int):
         self.insulin_log = {}
         for _ in range(duration):
             self.simulation_time += 1
@@ -40,7 +40,7 @@ class Simulator:
                 self.event_log.append(f"Time {self.simulation_time}: administration d'insuline")
             self.event_log.append(f"Time {self.simulation_time}: mesure de glycémie")
             
-            if glucose > 180:
+            if glucose > 170:
                 correction_bolus = self.controller.calculate_correction_bolus(glucose)
                 self.pump.deliver_bolus(correction_bolus)
                 self.insulin_log[self.simulation_time] += correction_bolus
@@ -68,9 +68,4 @@ class Simulator:
         return "\n".join(events)
 
     def run_simulation(self):
-        self.run(self.duration * 60)  # Convert hours to minutes
-
-# Supprimez ou commentez la partie suivante si elle n'est pas nécessaire
-# if __name__ == "__main__":
-#     sim = Simulator(duration=24)
-#     sim.run_simulation()
+        self.run(self.duration * 60)

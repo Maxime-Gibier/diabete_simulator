@@ -1,119 +1,119 @@
 {
-  "pump_configuration": {
-    "basal_rates": [
-      0.8, 0.6, 0.5, 0.7, 1.0, 1.2, 0.9, 0.8, 0.7, 0.6, 0.6, 0.5,
-      0.5, 0.4, 0.5, 0.7, 0.8, 1.1, 1.0, 0.9, 0.8, 0.6, 0.5, 0.4
-    ],
-    "insulin_to_carb_ratio": 10,
-    "max_bolus": 10,
-    "personalized_modes": {
-      "Sport": {
-        "basal_rate_adjustment": 0.8
-      },
-      "Day": {
-        "basal_rate_adjustment": 1.1,
-        "start_hour": 6,
-        "end_hour": 22
-      },
-      "Night": {
-        "basal_rate_adjustment": 0.85,
-        "start_hour": 22,
-        "end_hour": 6
-      }
-    }
-  },
-  "basal_insulin_administration": {
-    "initial_glucose": 120,
-    "programmed_basal_rate": 0.8,
-    "cgm_correction": {
-      "measured_glucose": 180,
-      "target_glucose": 120,
-      "insulin_sensitivity_factor": 30,
-      "correction_dose": 2
-    }
-  },
-  "meal_bolus": {
-    "carbs_consumed": 60,
-    "insulin_to_carb_ratio": 10,
-    "calculated_bolus": 6
-  },
-  "correction_bolus": {
-    "measured_glucose": 250,
-    "target_glucose": 100,
-    "insulin_sensitivity_factor": 40,
-    "calculated_bolus": 3.75
-  },
-  "continuous_glucose_measurement": {
-    "measurement_interval": 5,
-    "glucose_data": [
-      {"time": 0, "glucose": 110},
-      {"time": 5, "glucose": 112},
-      {"time": 10, "glucose": 115},
-      {"time": 15, "glucose": 118},
-      {"time": 20, "glucose": 120},
-      {"time": 25, "glucose": 123}
-    ]
-  },
-  "patient_alerts": {
-    "glucose_limits": {
-      "measured_glucose": 300,
-      "upper_critical_limit": 250
-    },
-    "battery": {
-      "level": 10,
-      "critical_threshold": 15
-    }
-  },
-  "history": {
-    "consultation_period": 7,
-    "glucose_history": [
-      {"date": "2024-10-01", "glucose": 110},
-      {"date": "2024-10-02", "glucose": 120},
-      {"date": "2024-10-03", "glucose": 130},
-      {"date": "2024-10-04", "glucose": 140},
-      {"date": "2024-10-05", "glucose": 135},
-      {"date": "2024-10-06", "glucose": 128},
-      {"date": "2024-10-07", "glucose": 122}
-    ],
-    "insulin_dose_history": [
-      {"date": "2024-10-01", "dose": 25},
-      {"date": "2024-10-02", "dose": 28},
-      {"date": "2024-10-03", "dose": 30},
-      {"date": "2024-10-04", "dose": 27},
-      {"date": "2024-10-05", "dose": 26},
-      {"date": "2024-10-06", "dose": 29},
-      {"date": "2024-10-07", "dose": 24}
-    ]
-  },
-  "personalized_mode_management": {
-    "sport_mode": {
-      "basal_rate_reduction": 0.2
-    }
-  },
-  "closed_loop_implementation": {
-    "measured_glucose": 150,
-    "target_glucose": 100,
-    "insulin_sensitivity_factor": 30,
-    "calculated_adjustment": 1.67
-  },
-  "simulation": {
-    "initial_glucose": 110,
-    "duration": 24,
-    "hourly_glucose_data": [
-      {"hour": 0, "glucose": 110},
-      {"hour": 1, "glucose": 115},
-      {"hour": 2, "glucose": 120},
-      {"hour": 3, "glucose": 125},
-      {"hour": 4, "glucose": 130},
-      {"hour": 5, "glucose": 128},
-      {"hour": 6, "glucose": 125}
-    ]
-  },
-  "unit_test": {
-    "meal_bolus_calculation": {
-      "carbs_consumed": 60,
-      "insulin_to_carb_ratio": 10,
-      "expected_result": 6
-    }
-  }
+	"pump_configuration": {
+		"basal_rates": [
+			0.8, 0.6, 0.5, 0.7, 1.0, 1.2, 0.9, 0.8, 0.7, 0.6, 0.6, 0.5, 0.5, 0.4, 0.5,
+			0.7, 0.8, 1.1, 1.0, 0.9, 0.8, 0.6, 0.5, 0.4
+		],
+		"insulin_to_carb_ratio": 10,
+		"max_bolus": 10,
+		"personalized_modes": {
+			"Sport": {
+				"basal_rate_adjustment": 0.8
+			},
+			"Day": {
+				"basal_rate_adjustment": 1.1,
+				"start_hour": 6,
+				"end_hour": 22
+			},
+			"Night": {
+				"basal_rate_adjustment": 0.85,
+				"start_hour": 22,
+				"end_hour": 6
+			}
+		}
+	},
+	"basal_insulin_administration": {
+		"initial_glucose": 120,
+		"programmed_basal_rate": 0.8,
+		"cgm_correction": {
+			"measured_glucose": 180,
+			"target_glucose": 120,
+			"insulin_sensitivity_factor": 30,
+			"correction_dose": 2
+		}
+	},
+	"meal_bolus": {
+		"carbs_consumed": 60,
+		"insulin_to_carb_ratio": 10,
+		"calculated_bolus": 6
+	},
+	"correction_bolus": {
+		"measured_glucose": 250,
+		"target_glucose": 100,
+		"insulin_sensitivity_factor": 40,
+		"calculated_bolus": 3.75
+	},
+	"continuous_glucose_measurement": {
+		"measurement_interval": 5,
+		"glucose_data": [
+			{ "time": 0, "glucose": 110 },
+			{ "time": 5, "glucose": 112 },
+			{ "time": 10, "glucose": 115 },
+			{ "time": 15, "glucose": 118 },
+			{ "time": 20, "glucose": 120 },
+			{ "time": 25, "glucose": 123 }
+		]
+	},
+	"patient_alerts": {
+		"glucose_limits": {
+			"measured_glucose": 300,
+			"upper_critical_limit": 250
+		},
+		"battery": {
+			"level": 10,
+			"critical_threshold": 15
+		}
+	},
+"history": {
+		"consultation_period": 7,
+		"glucose_history": [
+			{ "date": "2024-10-01", "glucose": 110 },
+			{ "date": "2024-10-02", "glucose": 120 },
+			{ "date": "2024-10-03", "glucose": 130 },
+			{ "date": "2024-10-04", "glucose": 140 },
+			{ "date": "2024-10-05", "glucose": 	135 },
+			{ "date": "2024-10-06", "glucose": 128 },
+			{ "date": "2024-10-07", "glucose": 122 }
+		],
+		"insulin_dose_history": [
+			{ "date": "2024-10-01", "dose": 25 },
+			{ "date": "2024-10-02", "dose": 28 },
+			{ "date": "2024-10-03", "dose": 30 },
+			{ "date": "2024-10-04", "dose": 27 },
+			{ "date": "2024-10-05", "dose": 26 },
+			{ "date": "2024-10-06", "dose": 29 },
+			{ "date": "2024-10-07", "dose": 24 }
+		]
+	},
+	"personalized_mode_management": {
+		"sport_mode": {
+			"basal_rate_reduction": 0.2
+		}
+	},
+	"closed_loop_implementation": {
+		"measured_glucose": 150,
+		"target_glucose": 100,
+		"insulin_sensitivity_factor": 30,
+		"calculated_adjustment": 1.67
+	},
+	"simulation": {
+		"initial_glucose": 110,
+		"duration": 24,
+		"hourly_glucose_data": [
+			{ "hour": 0, "glucose": 110 },
+			{ "hour": 1, "glucose": 115 },
+			{ "hour": 2, "glucose": 120 },
+			{ "hour": 3, "glucose": 125 },
+			{ "hour": 4, "glucose": 130 },
+			{ "hour": 5, "glucose": 128 },
+			{ "hour": 6, "glucose": 125 }
+		]
+	},
+	"unit_test": {
+		"meal_bolus_calculation": {
+			"carbs_consumed": 60,
+			"insulin_to_carb_ratio": 10,
+			"expected_result": 6
+		}
+	}
 }

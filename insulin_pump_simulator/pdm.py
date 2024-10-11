@@ -1,136 +1,73 @@
-from .insulin_pump import InsulinPump
-from .controller import ClosedLoopController
-from .config import PumpConfig
-from datetime import datetime, timedelta
+from insulin_pump_simulator.insulin_pump import InsulinPump
+from insulin_pump_simulator.controller import ClosedLoopController
+from insulin_pump_simulator.config import PumpConfig
+from typing import Dict
+import json
 
 class PDM:
-    def __init__(self, pump):
-        self.pump = pump
-        self.last_alert = ""
+    def __init__(self, target_glucose: float):
+        with open('data/sample_input_data.json', 'r') as file:
+            data = json.load(file)
+
+        self.pump = InsulinPump()
+        self.target_glucose = target_glucose
+        self.config = PumpConfig()
+        self.controller = ClosedLoopController(self.target_glucose)
+        self.history = {
+            'glucose': data['history']['glucose_history'],
+            'insulin_dose': data['history']['insulin_dose_history']
+        }
         self.last_message = ""
-        self.personalized_modes = {}
-        self.active_mode = None
-        self.glucose_history = []
-        self.insulin_dose_history = []
-        self.history = []
 
-    def configure_basal_rates(self, basal_rates):
-        self.pump.config.basal_rates = basal_rates
-        return "Taux basaux configurés avec succès"
-
-    def configure_insulin_to_carb_ratio(self, icr):
-        self.pump.config.insulin_to_carb_ratio = icr
-        return "Ratio insuline/glucides configuré avec succès"
-
-    def configure_insulin_sensitivity_factor(self, isf):
-        self.pump.config.insulin_sensitivity_factor = isf
-        return "Facteur de sensibilité à l'insuline configuré avec succès"
-
-    def configure_max_bolus(self, max_bolus):
-        self.pump.config.max_bolus = max_bolus
-        return "Dose maximale de bolus configurée avec succès"
-
-    def enter_carbs(self, carbs):
-        bolus = self.calculate_meal_bolus(carbs)
+    def set_meal(self, carbs: float) -> None:
+        bolus = self.pump.calculate_meal_bolus(carbs)
         self.pump.deliver_bolus(bolus)
-        self.last_message = f"Bolus de repas calculé et administré : {bolus} U"
-        return bolus
+        print(f"Bolus de repas administré : {bolus} U")
 
-    def calculate_correction_bolus(self, current_glucose, target_glucose):
-        bolus = self.pump.calculate_correction_bolus(current_glucose, target_glucose)
-        self.history.append(f"Correction bolus calculated: {bolus} U")
-        return bolus
+    def set_target_glucose(self, target: float) -> None:
+        self.target_glucose = target
+        self.controller.target_glucose = target
+        print(f"Glycémie cible ajustée à {target} mg/dL")
 
-    def deliver_bolus(self, amount):
-        self.pump.deliver_bolus(amount)
-        self.last_message = f"Dose ajustée administrée : {amount:.2f} U"
-        self.record_insulin_dose(datetime.now(), amount)
+    def apply_new_config(self, config: PumpConfig) -> None:
+        self.pump.apply_configuration(config)
+        self.config = config
 
-    def get_history(self):
-        return self.history
+    def add_alarm(self, alarm: str) -> None:
+        self.pump.add_alarm(alarm)
 
-    def configure_personalized_mode(self, mode_name, mode_params):
-        self.personalized_modes[mode_name] = mode_params
-        return f"Mode personnalisé '{mode_name}' configuré"
-
-    def activate_personalized_mode(self, mode_name):
-        if mode_name in self.personalized_modes:
-            self.active_mode = mode_name
-            mode = self.personalized_modes[mode_name]
-            self._adjust_pump_settings(mode)
-            return f"Mode personnalisé '{mode_name}' activé"
-        else:
-            raise ValueError(f"Mode {mode_name} not found")
-
-    def deactivate_personalized_mode(self):
-        if self.active_mode:
-            self._reset_pump_settings()
-            self.active_mode = None
-            return "Mode personnalisé désactivé"
-
-    def _adjust_pump_settings(self, mode):
-        # Implémentez l'ajustement des paramètres de la pompe ici
-        pass
-
-    def _reset_pump_settings(self):
-        # Implémentez la réinitialisation des paramètres de la pompe ici
-        pass
-
-    def calculate_meal_bolus(self, carbs):
-        insulin_to_carb_ratio = self.pump.config.insulin_to_carb_ratio
-        bolus = carbs / insulin_to_carb_ratio
-        bolus = round(bolus, 1)
-        self.last_message = f"Bolus alimentaire calculé : {bolus:.1f} U"
-        self.record_insulin_dose(datetime.now(), bolus)
-        return bolus
-
-    def administer_meal_bolus(self, carbs):
-        bolus = self.calculate_meal_bolus(carbs)
-        self.pump.deliver_bolus(bolus)
-        self.last_message = f"Bolus de repas administré : {bolus} U"
-        return bolus
-
-    def confirm_bolus_administration(self, bolus):
-        self.pump.deliver_bolus(bolus)
-        self.last_message = f"Bolus de correction de {bolus:.2f} U administré et enregistré"
-
-    def record_glucose(self, date, glucose):
-        self.glucose_history.append({"date": date, "glucose": glucose})
-
-    def record_insulin_dose(self, date, dose):
-        self.insulin_dose_history.append({"date": date, "dose": dose})
-
-    def check_glucose_limits(self, glucose):
-        if glucose > 250:
-            self.last_alert = f"Alerte : glycémie critique de {glucose} mg/dL"
-        elif glucose < 70:
-            self.last_alert = f"Alerte : glycémie basse de {glucose} mg/dL"
-        else:
-            self.last_alert = ""
-        print(f"check_glucose_limits called, last_alert: {self.last_alert}")  # Ligne de débogage
-
-    def check_pump_status(self):
-        if self.pump.battery_level < 20:
-            self.last_alert = f"Alerte : Batterie faible, niveau actuel à {self.pump.battery_level}%"
-        elif self.pump.is_occluded:
-            self.last_alert = "Alerte : Obstruction détectée dans le système de délivrance d'insuline"
-        else:
-            self.last_alert = ""
-        print(f"check_pump_status called, last_alert: {self.last_alert}")  # Ligne de débogage
-
-    def get_glucose_history(self, start_date, end_date):
-        history = [entry for entry in self.glucose_history if start_date <= entry['date'] <= end_date]
+    def view_glucose_history(self) -> None:
         self.last_message = "Historique de glycémie consulté avec succès"
-        return history
+        return self.history['glucose']
+    
+    def view_insulin_dose_history(self) -> None:
+        self.last_message = "Historique de glycémie consulté avec succès"
+        return self.history['insulin_dose']
 
-    def get_insulin_dose_history(self, start_date=None, end_date=None):
-        if start_date is None and end_date is None:
-            history = self.insulin_dose_history
+    def set_mode(self, mode: str, config: Dict) -> None:
+        self.config.modes[mode] = config
+        self.pump.config.active_mode = mode
+        self.pump.apply_configuration(self.pump.config.modes[mode])
+        self.last_message = f"Mode '{mode}' configuré avec succès"
+
+    def check_battery_level(self) -> None:
+        if self.pump.battery_level < 20:
+            self.add_alarm("Low battery alert")
+            self.pump.last_message = f"Alerte : Batterie faible, niveau actuel à {self.pump.battery_level} %"
+        return self.pump.last_message, self.pump.alarms
+    
+    def get_mode(self) -> str:
+        return self.pump.config.active_mode, f"Mode '{self.pump.config.active_mode}' est actuellement actif"
+
+    def activate_mode(self, mode: str) -> None:
+        if mode in self.config.modes:
+            self.pump.config.active_mode = mode
+            self.apply_configuration(self.config.modes[mode])
+            self.pump.last_message = f"Mode '{mode}' activé avec succès"
         else:
-            if start_date is None:
-                start_date = datetime.min
-            if end_date is None:
-                end_date = datetime.max
-            history = [entry for entry in self.insulin_dose_history if start_date <= entry['date'] <= end_date]
-        self.last_message = "Historique des doses d'insuline consulté avec succès"
-        return history
+            raise ValueError(f"Mode {mode} not found")
+        
+    def apply_configuration(self, config) -> None:
+        if config["basal_rate_adjustment"] is not None:
+            self.pump.config.basal_rates = [round(rate * config["basal_rate_adjustment"], 2) for rate in self.pump.config.basal_rates]
+        self.last_message = "Nouvelle configuration appliquée"
