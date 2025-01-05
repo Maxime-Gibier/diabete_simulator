@@ -1,12 +1,10 @@
-from insulin_pump_simulator.pdm import PDM
-from insulin_pump_simulator.config import PumpConfig
-from insulin_pump_simulator.cgm import CGM
-from insulin_pump_simulator.controller import ClosedLoopController
-from insulin_pump_simulator.patient import Patient
-from insulin_pump_simulator.insulin_pump import InsulinPump
+from insulin_pump_simulator.modules.patient import PDM, PumpConfig, CGM, ClosedLoopController, Patient, InsulinPump
 import json
+import os
 
-with open('data/sample_input_data.json', 'r') as file:
+project_root = os.path.dirname(os.path.dirname(__file__))
+data_path = os.path.join(project_root, 'data', 'sample_input_data.json')
+with open(data_path, 'r') as file:
     data = json.load(file)
     config = data['pump_configuration']
 
@@ -303,6 +301,10 @@ def test_meal_bolus_calculation():
     assert calculated_bolus == expected_bolus, f"Le bolus calculé devrait être {expected_bolus}U, mais est {calculated_bolus}U"
     print("User story 10 : Le calcul du bolus alimentaire est correct")
 
+def test_start_platform():
+    response = client.get("/start_platform/")
+    assert response.status_code == 200
+    assert response.json() == {"status": "Platform running"}
 
 if __name__ == "__main__":
     all_tests_passed = True
@@ -327,6 +329,7 @@ if __name__ == "__main__":
         test_adjusted_dose_administration()
         test_simulate_interaction()
         test_meal_bolus_calculation()
+        test_start_platform()
 
     except AssertionError as e:
         print(f"Le test a échoué : {str(e)}")

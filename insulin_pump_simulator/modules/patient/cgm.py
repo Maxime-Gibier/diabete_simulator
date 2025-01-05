@@ -1,12 +1,18 @@
 import json
-from insulin_pump_simulator.patient import Patient
+import random
+import os
+from .patient import Patient
+from typing import TYPE_CHECKING
 
-with open('data/sample_input_data.json', 'r') as file:
+if TYPE_CHECKING:
+    from .pdm import PDM
+
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+data_path = os.path.join(project_root, 'data', 'sample_input_data.json')
+with open(data_path, 'r') as file:
     data = json.load(file)
     measurement_interval = data['continuous_glucose_measurement']['measurement_interval']
     glucose_critical_limit = data['patient_alerts']['glucose_limits']['upper_critical_limit']
-
-
 
 class CGM:
     def __init__(self, measurement_interval: int = measurement_interval):
@@ -15,7 +21,8 @@ class CGM:
         self.last_message = ""
 
     def measure_glucose(self, patient: Patient) -> float:
-        from insulin_pump_simulator.pdm import PDM
+        from .pdm import PDM
+
         pdm = PDM(target_glucose=120)
 
         self.current_glucose = patient.glucose_level

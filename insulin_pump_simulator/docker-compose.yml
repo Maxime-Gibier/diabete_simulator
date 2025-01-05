@@ -1,0 +1,47 @@
+version: "3.9"
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"        # Port pour la communication entre services
+      - "15672:15672"      # Port pour l'interface d'administration
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  display:
+    build:
+      context: ./modules/display
+    container_name: display
+    ports:
+      - "8001:8000"
+    depends_on:
+      - rabbitmq
+
+  data_platform:
+    build:
+      context: ./modules/data_platform
+    container_name: data_platform
+    ports:
+      - "8002:8000"
+    depends_on:
+      - rabbitmq
+
+  cloud:
+    build:
+      context: ./modules/cloud
+    container_name: cloud
+    ports:
+      - "8003:8000"
+    depends_on:
+      - rabbitmq
+
+  device:
+    build:
+      context: ./modules/device
+    container_name: device
+    ports:
+      - "8004:8000"
+    depends_on:
+      - rabbitmq

@@ -1,12 +1,15 @@
-from insulin_pump_simulator.insulin_pump import InsulinPump
-from insulin_pump_simulator.controller import ClosedLoopController
-from insulin_pump_simulator.config import PumpConfig
+from .insulin_pump import InsulinPump
+from .controller import ClosedLoopController
+from .config import PumpConfig
 from typing import Dict
 import json
+import os
 
 class PDM:
     def __init__(self, target_glucose: float):
-        with open('data/sample_input_data.json', 'r') as file:
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        data_path = os.path.join(project_root, 'data', 'sample_input_data.json')
+        with open(data_path, 'r') as file:
             data = json.load(file)
 
         self.pump = InsulinPump()
@@ -71,3 +74,32 @@ class PDM:
         if config["basal_rate_adjustment"] is not None:
             self.pump.config.basal_rates = [round(rate * config["basal_rate_adjustment"], 2) for rate in self.pump.config.basal_rates]
         self.last_message = "Nouvelle configuration appliquée"
+
+import random
+import time
+from ..display.main import Display
+
+class GlucoseSensor:
+    def __init__(self, display):
+        self.display = display  # Référence au dispositif d’affichage
+
+    def simulate_and_send_data(self):
+        # Simuler un niveau de glucose et l'envoyer
+        glucose_level = random.randint(50, 300)  # Simuler un niveau entre 50 et 200 mg/dL
+        print(f"[CGM] Niveau de glucose simulé : {glucose_level} mg/dL")
+        self.display.receive_glucose_data(glucose_level)
+
+if __name__ == "__main__":
+    # Initialiser le dispositif d'affichage
+    display = Display()
+
+    # Initialiser le capteur de glucose
+    sensor = GlucoseSensor(display)
+
+    # Simuler l'envoi de données périodiques
+    for _ in range(5):  # Simuler 5 cycles
+        sensor.simulate_and_send_data()
+        time.sleep(2)  # Pause de 2 secondes entre chaque simulation
+
+    # Afficher toutes les données reçues
+    print(f"[DISPLAY] Toutes les données reçues : {display.get_all_data()}")

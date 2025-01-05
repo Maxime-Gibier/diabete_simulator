@@ -13,9 +13,9 @@ def global_test_config():
     }
 
 # Uncomment these imports as you create the corresponding modules
-from insulin_pump_simulator.patient import Patient
-from insulin_pump_simulator.insulin_pump import InsulinPump
-# from insulin_pump_simulator.cgm import CGM
-# from insulin_pump_simulator.controller import Controller
-# from insulin_pump_simulator.pdm import PDM
-# from insulin_pump_simulator.simulator import Simulator
+from insulin_pump_simulator.modules.patient import Patient
+from insulin_pump_simulator.modules.patient.insulin_pump import InsulinPump
+from insulin_pump_simulator.modules.patient.cgm import CGM
+from insulin_pump_simulator.modules.patient.controller import ClosedLoopController as Controller
+from insulin_pump_simulator.modules.patient.pdm import PDM
+from insulin_pump_simulator.modules.patient.simulator import Simulator

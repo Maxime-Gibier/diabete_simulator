@@ -1,7 +1,10 @@
-from insulin_pump_simulator.patient import Patient
+from .patient import Patient
 import json
+import os
 
-with open('data/sample_input_data.json', 'r') as file:
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+data_path = os.path.join(project_root, 'data', 'sample_input_data.json')
+with open(data_path, 'r') as file:
     data = json.load(file)
     config = data['pump_configuration']
 

@@ -1,6 +1,9 @@
+import os
 import json
 
-with open('data/sample_input_data.json', 'r') as file:
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+data_path = os.path.join(project_root, 'data', 'sample_input_data.json')
+with open(data_path, 'r') as file:
     data = json.load(file)
     patient_data = data['basal_insulin_administration']
 
