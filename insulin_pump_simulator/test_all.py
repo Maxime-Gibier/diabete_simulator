@@ -73,36 +73,40 @@ def test_glucose_sensor_to_display(num_simulations=10):
         glucose_level, message, alarms = cgm.measure_glucose(patient)
         
         if alarms:
-            print(f"Test #{idx} : [ALERTE] Alarmes actives : {', '.join(alarms)}")
-            print(f"Test #{idx} : [ALERTE] Message : {message}")
+            print(f"\033[91m[ALERTE] Alarmes actives : {', '.join(alarms)}")
+            print(f"[ALERTE] Message : {message}\033[0m")
         else:
             print(f"Test #{idx} : [OK] Niveau de glucose : {value} mg/dL")
 
-# Tester l'API REST de la plateforme --------------------------------------------------------------
+# Tester l'API REST de la plateforme
 def test_platform_to_cloud():
     visual_separator("Test : Connexion de la Plateforme au Cloud")
 
-    # Simuler une API REST pour le Cloud (avec TestClient)
+    # Créer les clients de test pour la plateforme et le cloud
+    platform_client = TestClient(platform_app)
     cloud_client = TestClient(cloud_app)
 
-    @cloud_app.post("/cloud_data")
-    def receive_data(data: dict):
-        print(f"[CLOUD] Données reçues : {data}")
-        return {"status": "success", "message": "Data received"}
+    # Données de test
+    test_data = {
+        "glucose_level": 150,
+        "timestamp": "2023-12-20T10:00:00",
+        "device_id": "CGM_001"
+    }
 
-    # Simuler une requête HTTP de la plateforme vers le cloud
-    platform_client = TestClient(platform_app)
-
-    payload = {"glucose_level": 150}
-    response = platform_client.post("/send_to_cloud", json=payload)
+    # Envoyer les données via la plateforme
+    platform_response = platform_client.post("/send_to_cloud", json=test_data)
     
-    assert response.status_code == 200, "[TEST ÉCHEC] La plateforme n'a pas réussi à envoyer les données au cloud."
-    print("[TEST SUCCÈS] La plateforme a envoyé les données au cloud.")
+    # Vérifier la réponse de la plateforme
+    assert platform_response.status_code == 200, "[TEST ÉCHEC] La plateforme n'a pas réussi à envoyer les données"
+    print("[TEST SUCCÈS] La plateforme a envoyé les données au cloud")
 
-    # Vérifier la réception des données par le cloud
-    cloud_response = cloud_client.post("/cloud_data", json=payload)
-    assert cloud_response.status_code == 200, "[TEST ÉCHEC] Le cloud n'a pas reçu les données correctement."
-    print("[TEST SUCCÈS] Le cloud a reçu les données correctement.")
+    # Envoyer directement au cloud pour vérifier la réception
+    cloud_response = cloud_client.post("/cloud_data", json=test_data)
+    
+    # Vérifier la réponse du cloud
+    assert cloud_response.status_code == 200, "[TEST ÉCHEC] Le cloud n'a pas reçu les données"
+    assert cloud_response.json()["status"] == "success", "[TEST ÉCHEC] Le cloud n'a pas confirmé la réception"
+    print(f"[TEST SUCCÈS] Le cloud a bien reçu les données : {test_data}")
 
 def publish_message_to_queue(message):
     connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
@@ -158,22 +162,29 @@ def test_platform_to_cloud_with_rabbitmq():
     if not STOP_THREAD:
         print("[AVERTISSEMENT] Timeout atteint en attendant le message RabbitMQ")
 
-def test_platform_cloud_connections():
-    """Tester les connexions entre la plateforme et le cloud."""
-    test_platform_to_cloud()  # Test de connexion via API REST
-    test_platform_to_cloud_with_rabbitmq()  # Test de connexion via RabbitMQ
+
+def wait_for_key():
+    """Attend silencieusement l'appui d'une touche."""
+    input()
 
 if __name__ == "__main__":
     try:
         visual_separator("DÉBUT DES TESTS")
+        wait_for_key()
         
         # Tests de connexion
-        test_platform_cloud_connections()
+        test_platform_to_cloud()
+        wait_for_key()
         
         # Tests fonctionnels
         test_display_initialization()
+        wait_for_key()
+        
         test_sensor_initialization()
+        wait_for_key()
+        
         test_glucose_sensor_to_display()
+        wait_for_key()
         
         visual_separator("FIN DES TESTS")
         print("[SUCCÈS] Tous les tests ont réussi!")
